@@ -1,10 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>テスト</title>
+<meta charset="UTF-8">
+<title>Township 飛行機オーダー管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: sans-serif;
+  padding: 10px;
+  background: #fdfaf7;
+}
+
+.taiCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.taiRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+button {
+  padding: 8px 12px;
+  font-size: 16px;
+}
+
+.taiSuggest div {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.taiResult {
+  margin-top: 10px;
+  font-size: 14px;
+}
+</style>
 </head>
+
 <body>
-  <h1>動いた！</h1>
+
+<h2>✈️ オーダー管理</h2>
+
+<div id="taiApp"></div>
+
+<button onclick="taiCalc()">計算する</button>
+
+<script>
+/* ===== データ ===== */
+const taiPlaneData = {
+  "パン": { min: 3, max: 9, time: 5 },
+  "ケーキ": { min: 2, max: 6, time: 30 },
+  "チーズ": { min: 4, max: 10, time: 20 }
+};
+
+/* ===== 初期描画（3枠） ===== */
+function taiInit() {
+  let html = "";
+  for (let i = 0; i < 3; i++) {
+    html += `
+    <div class="taiCard">
+      <input type="text" placeholder="品名入力" id="item${i}">
+      <div id="suggest${i}" class="taiSuggest"></div>
+
+      <div class="taiRow">
+        在庫：
+        <button onclick="taiAdd(${i}, -1)">−</button>
+        <span id="stock${i}">0</span>
+        <button onclick="taiAdd(${i}, 1)">＋</button>
+      </div>
+
+      <div id="result${i}" class="taiResult"></div>
+    </div>
+    `;
+  }
+  document.getElementById("taiApp").innerHTML = html;
+
+  /* 入力イベント */
+  for (let i = 0; i < 3; i++) {
+    document.getElementById(`item${i}`).addEventListener("input", function() {
+      taiSuggest(this.value, i);
+    });
+  }
+}
+
+/* ===== 在庫ボタン ===== */
+function taiAdd(i, val) {
+  const el = document.getElementById(`stock${i}`);
+  let num = Number(el.innerText);
+  num = Math.max(0, num + val);
+  el.innerText = num;
+}
+
+/* ===== サジェスト ===== */
+const taiItems = Object.keys(taiPlaneData);
+
+function taiSuggest(value, i) {
+  const list = taiItems.filter(name => name.includes(value));
+
+  let html = "";
+  list.slice(0,5).forEach(name => {
+    html += `<div onclick="taiSelect('${name}', ${i})">${name}</div>`;
+  });
+
+  document.getElementById(`suggest${i}`).innerHTML = html;
+}
+
+function taiSelect(name, i) {
+  document.getElementById(`item${i}`).value = name;
+  document.getElementById(`suggest${i}`).innerHTML = "";
+}
+
+/* ===== 計算 ===== */
+function taiCalc() {
+
+  for (let i = 0; i < 3; i++) {
+
+    const name = document.getElementById(`item${i}`).value;
+    const stock = Number(document.getElementById(`stock${i}`).innerText);
+
+    if (!taiPlaneData[name]) continue;
+
+    const data = taiPlaneData[name];
+
+    const minNeed = Math.max(data.min - stock, 0);
+    const maxNeed = Math.max(data.max - stock, 0);
+
+    const minBase = minNeed * data.time;
+    const maxBase = maxNeed * data.time;
+
+    let html = `<b>${name}</b><br>`;
+
+    for (let rate = 0; rate <= 50; rate += 5) {
+      const multi = 1 - rate / 100;
+
+      const minTime = Math.ceil(minBase * multi);
+      const maxTime = Math.ceil(maxBase * multi);
+
+      html += `工場時短${rate}%：${minTime}分 / ${maxTime}分<br>`;
+
+      if (maxTime > 300) {
+        html += `⚠ 市場購入 or リクエスト推奨<br>`;
+      } else {
+        html += `✅ 作成可能<br>`;
+      }
+
+      html += `<br>`;
+    }
+
+    document.getElementById(`result${i}`).innerHTML = html;
+  }
+}
+
+/* 起動 */
+taiInit();
+</script>
+
 </body>
 </html>
