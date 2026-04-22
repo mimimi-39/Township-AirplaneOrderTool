@@ -17,7 +17,7 @@ function getItemData(name) {
 }
 
 /**
- * 2. 時間のパース（"1時間30分" または 数値を分に変換）
+ * 2. 時間のパース
  */
 function parseTimeToMinutes(timeValue) {
     if (!timeValue) return 0;
@@ -29,20 +29,16 @@ function parseTimeToMinutes(timeValue) {
     if (hourMatch) totalMinutes += parseInt(hourMatch[1]) * 60;
     if (minMatch) totalMinutes += parseInt(minMatch[1]);
     
-    // もし "90" のような数値文字列だった場合のフォールバック
     if (totalMinutes === 0 && !isNaN(timeValue)) return parseFloat(timeValue);
-    
     return totalMinutes;
 }
 
 /**
- * 3. アドバイス判定（5時間ルール）
+ * 3. アドバイス判定
  */
 function getAdvice(minutes, isLongProduct) {
     if (minutes <= 0) return `<span class="green">🔵 在庫OK</span>`;
-    
     const roundedMin = Math.round(minutes);
-    // 元々5時間以上かかる品、または計算結果が300分超え
     if (isLongProduct || minutes > 300) {
         return `<span class="red">🔴 ${roundedMin}分: 市場/リクエスト推奨</span>`;
     } else if (minutes > 240) {
@@ -69,60 +65,70 @@ function updateCalculation() {
         const data = getItemData(name);
         const orderData = (typeof PLANE_ORDER_DB !== 'undefined') ? PLANE_ORDER_DB[name] : null;
 
-        if (data && orderData) {
-            const baseMin = parseTimeToMinutes(data.time);
-            const shortage = Math.max(0, orderData.max - stock);
-            
-            // --- 時間計算（畑か工場か） ---
-            let totalTime;
-            const isFarm = (data.category === "農作物");
-            const isLongProduct = (baseMin >= 300); 
+        // データが見つからない場合はメッセージを出して終了
+        if (!data || !orderData) {
+            resultDiv.innerHTML = name ? `<p class='error-text'>データ未登録です</p>` : "";
+            return;
+        }
 
-            if (shortage === 0) {
-                totalTime = 0;
-            } else if (isFarm) {
-                totalTime = baseMin; // 畑は一括
+        // --- 基本数値の準備 ---
+        const baseMin = parseTimeToMinutes(data.time);
+        const shortage = Math.max(0, orderData.max - stock);
+        const isFarm = (data.category === "農作物");
+        const isLongProduct = (baseMin >= 300); 
+
+        // --- 時間計算 ---
+        let totalTime = 0;
+        if (shortage > 0) {
+            if (isFarm) {
+                totalTime = baseMin; // 畑
             } else {
                 const yieldCount = data.yield || 1;
                 const cycles = Math.ceil(shortage / yieldCount);
-                totalTime = cycles * baseMin; // 工場は順次
+                totalTime = cycles * baseMin; // 工場
             }
-
-            // --- 原材料（レシピ）表示（エラー対策強化版） ---
-            let recipeHtml = "";
-            if (data.ingredients && shortage > 0) {
-                recipeHtml = `<div class="recipe">【必要材料】<br>`;
-                for (let [ingName, amount] of Object.entries(data.ingredients)) {
-                    const count = parseFloat(amount);
-                    if (!isNaN(count)) {
-                        recipeHtml += `・${ingName} × ${Math.ceil(count * shortage)}個<br>`;
-                    }
-                }
-                recipeHtml += `</div>`;
-            }
-
-            let html = `<div class="info">
-                最大: ${orderData.max}個 / 最小: ${orderData.min}個<br>
-                不足: <strong>${shortage}個</strong> (${isFarm ? '畑で一斉収穫' : '工場で順次作成'})
-                ${recipeHtml}
-            </div>`;
-            
-            if (shortage === 0) {
-                html += `<p class="green" style="text-align:center; font-weight:bold;">✅ 在庫十分！</p>`;
-            } else {
-                html += `<ul class="advice-list">`;
-                [0, 5, 10, 15, 30, 40, 50].forEach(rate => {
-                    const calcMin = totalTime * (1 - rate / 100);
-                    html += `<li><strong>${rate}%</strong>: ${getAdvice(calcMin, isLongProduct)}</li>`;
-                });
-                html += `</ul>`;
-            }
-            resultDiv.innerHTML = html;
-        } else if (name) {
-            resultDiv.innerHTML = `<p class='error-text'>データ未登録です</p>`;
-        } else {
-            resultDiv.innerHTML = "";
         }
+
+        // --- ① 基本情報エリアの作成 ---
+        let html = `<div class="info">
+            最大: <strong>${orderData.max}個</strong> / 最小: <strong>${orderData.min}個</strong><br>
+            不足: <strong>${shortage}個</strong> (${isFarm ? '畑で一斉収穫' : '工場で順次作成'})
+        </div>`;
+
+        // --- ② 必要材料（レシピ）エリアの作成 ---
+        // shortageが0より大きく、かつ材料データが存在する場合のみ追加
+        if (shortage > 0 && data.ingredients) {
+            let recipeHtml = `<div class="recipe">【必要材料】<br>`;
+            let hasIngredients = false;
+
+            for (let [ingName, amount] of Object.entries(data.ingredients)) {
+                const count = parseFloat(amount);
+                if (!isNaN(count)) {
+                    recipeHtml += `・${ingName} × ${Math.ceil(count * shortage)}個<br>`;
+                    hasIngredients = true;
+                }
+            }
+            recipeHtml += `</div>`;
+            
+            if (hasIngredients) {
+                html += recipeHtml; // 材料がある場合のみhtmlに結合
+            }
+        }
+
+        // --- ③ 時短判定エリアの作成 ---
+        if (shortage === 0) {
+            html += `<p class="green" style="text-align:center; font-weight:bold; margin-top:10px;">✅ 在庫十分！</p>`;
+        } else {
+            html += `<ul class="advice-list">`;
+            [0, 5, 10, 15, 30, 40, 50].forEach(rate => {
+                const calcMin = totalTime * (1 - rate / 100);
+                html += `<li><strong>${rate}%</strong>: ${getAdvice(calcMin, isLongProduct)}</li>`;
+            });
+            html += `</ul>`;
+        }
+
+        // 最後にまとめて表示
+        resultDiv.innerHTML = html;
     });
 }
 
@@ -131,9 +137,9 @@ function updateCalculation() {
  */
 window.onload = () => {
     const list = document.getElementById('item-list');
+    if (!list) return;
+
     const allNames = new Set();
-    
-    // 全DBから品名取得
     const dbRefs = [
         typeof FACTORY_DB !== 'undefined' ? FACTORY_DB : {},
         typeof BASIC_MATERIALS_DB !== 'undefined' ? BASIC_MATERIALS_DB : {},
@@ -144,7 +150,7 @@ window.onload = () => {
     ];
     
     dbRefs.forEach(db => Object.keys(db).forEach(n => {
-        if(n !== "undefined") allNames.add(n);
+        if(n && n !== "undefined") allNames.add(n);
     }));
 
     Array.from(allNames).sort().forEach(n => {
@@ -158,5 +164,5 @@ window.onload = () => {
     });
 
     document.addEventListener('input', updateCalculation);
-    console.log("シミュレーター正常起動。アイテム数:", allNames.size);
+    console.log("シミュレーター起動完了。");
 };
