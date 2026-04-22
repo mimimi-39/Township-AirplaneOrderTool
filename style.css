@@ -1,30 +1,157 @@
+/* 全体の設定 */
+:root {
+    --bg-color: #f7f9fc;           /* 清潔感のある明るいグレーブルー */
+    --card-bg: #ffffff;
+    --primary-text: #5a5a5a;
+    --accent-color: #ffb347;       /* 楽しさを出すハニーオレンジ */
+    --success-color: #72cc72;      /* 余裕：明るいグリーン */
+    --warning-color: #ff9a76;      /* ギリギリ：元気なコーラル */
+    --danger-color: #ff6b6b;       /* 購入推奨：明るいレッド */
+    --border-radius: 20px;         /* もっとなだらかな角丸に */
+}
+
+body {
+    font-family: "ヒラギノ丸ゴ Pro W4", "Hiragino Maru Gothic Pro", "Meiryo", sans-serif;
+    background-color: var(--bg-color);
+    color: var(--primary-text);
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: var(--accent-color);
+    font-size: 2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+/* カードのレイアウト */
+.cargo-slots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 各スロット：マルシェの屋台のようなイメージ */
+.slot {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    width: 320px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border: 3px solid #fff; /* 白枠でクッキリさせる */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.slot::before {
+    content: "🚢"; /* 積荷のアイコン */
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 4rem;
+    opacity: 0.05;
+    transform: rotate(15deg);
+}
+
+.slot:hover {
+    transform: scale(1.03); /* ぷるんと少し大きく */
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #fff3e0;
+}
+
+/* 入力エリア：ぷにぷにした質感 */
+input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 2px solid #eee;
+    border-radius: 15px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background-color: #fffdf9;
+    box-shadow: 0 0 8px rgba(255, 179, 71, 0.3);
+}
+
 .stock-input-group {
+    background: #fff9f0;
+    padding: 12px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 10px 0;
-    background: #f0f0f0;
-    padding: 5px 10px;
-    border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-.item-stock {
-    width: 80px !important;
-    margin: 0 !important;
-    border: 1px solid #ccc;
-}
-
-.error-text {
-    color: #e74c3c;
-    font-size: 0.8rem;
-}
-
+/* 結果表示エリア */
 .info {
-    border-left: 4px solid #3498db;
-    background: #eaf2f8;
+    background: #f0f7ff;
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 0.95rem;
+    color: #4a76a8;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.advice-list {
+    list-style: none;
+    padding: 0;
+}
+
+.advice-list li {
     padding: 10px;
-    margin: 10px 0;
+    margin-bottom: 5px;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
     font-size: 0.9rem;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
+}
+
+/* 判定色：もっと鮮やかに！ */
+.green { color: var(--success-color); font-weight: bold; }
+.orange { color: var(--warning-color); font-weight: bold; }
+.red { color: var(--danger-color); font-weight: bold; }
+
+/* 在庫OKのときの演出 */
+.calc-result p.green {
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 10px;
+    background: #e8f5e9;
+    border-radius: 10px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+    .slot { width: 100%; }
 }
 
 .recipe {
@@ -39,4 +166,30 @@
 
 .recipe b {
     color: var(--warning-color);
+}
+
+/* 島特産品用のアラートボックス */
+.island-alert {
+    background-color: #f0f7ff;
+    border: 2px dashed #7fa8cc;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #4a6a8a;
+}
+
+.island-title {
+    font-weight: bold;
+    color: #2c5d8a;
+    margin-bottom: 8px;
+    display: block;
+    text-align: center;
+    border-bottom: 1px solid #7fa8cc;
+}
+
+.island-alert strong {
+    text-decoration: underline;
+    color: var(--danger-color);
 }
