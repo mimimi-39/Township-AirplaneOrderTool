@@ -1,0 +1,28 @@
+.stock-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    background: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.item-stock {
+    width: 80px !important;
+    margin: 0 !important;
+    border: 1px solid #ccc;
+}
+
+.error-text {
+    color: #e74c3c;
+    font-size: 0.8rem;
+}
+
+.info {
+    border-left: 4px solid #3498db;
+    background: #eaf2f8;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 0.9rem;
+}
