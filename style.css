@@ -1,36 +1,36 @@
 /* 全体の設定 */
 :root {
-    --bg-color: #f7f9fc;
+    --bg-color: #f0f2f5;           /* 背景を少し濃くして白カードを際立たせる */
     --card-bg: #ffffff;
-    --primary-text: #333333;       /* より濃くして読みやすく */
-    --accent-color: #ff9800;       /* 少し彩度を上げて視認性アップ */
-    --success-color: #2e7d32;      /* 濃いめの緑 */
-    --warning-color: #ef6c00;      /* 濃いめの橙 */
-    --danger-color: #d32f2f;       /* 濃いめの赤 */
-    --border-radius: 16px;
+    --primary-text: #222222;       /* 文字はほぼ黒にしてコントラスト最大 */
+    --accent-color: #f57c00;       /* 視認性の高いオレンジ */
+    --success-color: #2e7d32;
+    --warning-color: #e65100;
+    --danger-color: #c62828;
+    --border-radius: 12px;         /* ワイド画面に合わせて少しシャープに */
 }
 
-/* ズーム防止：htmlとbodyの横揺れを完全に止める */
+/* 横揺れを徹底排除 */
 html, body {
     overflow-x: hidden;
     width: 100%;
     margin: 0;
     padding: 0;
-    font-size: 16px; /* 基本サイズを16pxに固定 */
+    -webkit-text-size-adjust: 100%; /* iOSのフォント自動調整を抑制 */
 }
 
 body {
     font-family: "ヒラギノ丸ゴ Pro W4", "Hiragino Maru Gothic Pro", "Meiryo", sans-serif;
     background-color: var(--bg-color);
     color: var(--primary-text);
-    padding: 20px 0;
+    padding: 15px 0;
 }
 
 h1 {
     text-align: center;
     color: var(--accent-color);
-    font-size: 1.8rem; /* タイトルを大きく */
-    margin-bottom: 20px;
+    font-size: 1.6rem;
+    margin: 10px 0 20px 0;
 }
 
 /* スロットを包むコンテナ */
@@ -38,87 +38,87 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     width: 100%;
 }
 
-/* スロット本体：86%幅で固定、ズレを防止 */
+/* 98%幅：スマホ画面をフルに活用 */
 .slot {
     background: var(--card-bg);
     border-radius: var(--border-radius);
-    padding: 20px;
-    width: 86%;
-    max-width: 450px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: 2px solid #eee;
+    padding: 18px 12px;       /* 内側の左右余白を絞って中身を広く */
+    width: 98%;               /* ご希望の98% */
+    max-width: 550px;         /* PCで見ても崩れないストッパー */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
     box-sizing: border-box;
 }
 
-/* ラベル：品目名を大きく強調 */
+/* 品目ラベル：大きく、ハッキリ */
 label {
     display: block;
-    font-size: 1.2rem; /* 1.2倍に拡大 */
+    font-size: 1.25rem;
     color: var(--accent-color);
-    font-weight: bold;
+    font-weight: 800;
     margin-bottom: 12px;
-    border-left: 5px solid var(--accent-color);
-    padding-left: 10px;
+    padding-left: 8px;
+    border-left: 6px solid var(--accent-color);
 }
 
-/* 入力エリア：ここが重要！16px以上に固定 */
+/* 入力欄：18pxで絶対ズームさせない＆デカ文字 */
 input {
     width: 100%;
-    height: 50px;       /* 高さを出してタップしやすく */
-    padding: 0 15px;
+    height: 54px;             /* 高さをさらに出して押しやすく */
+    padding: 0 12px;
     margin-bottom: 15px;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    font-size: 18px;    /* 18pxなら絶対ズームされず、かつ読みやすい */
+    border: 2px solid #bbb;   /* 枠線を少し濃く */
+    border-radius: 8px;
+    font-size: 18px;          /* ズーム防止の決定打 */
     box-sizing: border-box;
     background-color: #fff;
-    color: #000;        /* 入力文字はハッキリ黒で */
+    color: #000;
+    outline: none;
     -webkit-appearance: none;
 }
 
 input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    background-color: #fffdec;
+    border-color: #2196f3;    /* フォーカス時は青系で見やすく */
+    background-color: #f0f8ff;
 }
 
-/* 在庫数入力エリアの背景 */
+/* 在庫数入力エリア */
 .stock-input-group {
     background: #fff3e0;
     padding: 10px;
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 15px;
     font-weight: bold;
     font-size: 1.1rem;
 }
 
-/* 結果表示エリア：背景色を濃くして文字を白抜きに近く */
+/* 結果表示エリア：横幅いっぱいを活かして1行の情報を増やす */
 .info {
     background: #e3f2fd;
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 1.05rem; /* 少し大きく */
-    color: #1565c0;
-    line-height: 1.5;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1.1rem;        /* 情報を大きく */
+    color: #0d47a1;
+    line-height: 1.6;
+    border: 1px solid #bbdefb;
 }
 
 .recipe {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 2px dashed #bbdefb;
-    font-size: 1rem;    /* 材料名も読みやすく */
+    border-top: 2px dashed #90caf9;
+    font-size: 1.05rem;
     color: #333;
-    font-weight: bold;
 }
 
-/* 時短リスト：1行を太く、大きく */
+/* 時短リスト：タップミスを防ぐため少し高さを出す */
 .advice-list {
     list-style: none;
     padding: 0;
@@ -126,23 +126,25 @@ input:focus {
 }
 
 .advice-list li {
-    padding: 10px;
-    margin-bottom: 6px;
-    background: #ffffff;
+    padding: 12px 10px;
+    margin-bottom: 5px;
+    background: #fdfdfd;
     border: 1px solid #eee;
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     justify-content: space-between;
-    font-size: 1rem;    /* リスト内の文字も大きく */
+    font-size: 1rem;
+    font-weight: bold;
 }
 
-/* 判定色をよりハッキリ */
+/* 判定色：最大太さで強調 */
 .green { color: var(--success-color); font-weight: 900; }
 .orange { color: var(--warning-color); font-weight: 900; }
 .red { color: var(--danger-color); font-weight: 900; }
 
 .error-text {
-    color: #ff5252;
+    color: #d32f2f;
     font-weight: bold;
     text-align: center;
+    padding: 10px;
 }
