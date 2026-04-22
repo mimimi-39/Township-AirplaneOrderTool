@@ -2,51 +2,58 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>飛行機準備・在庫管理シミュレーター</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>タウンシップ積荷計算機</title>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>✈️ 飛行機予約・在庫考慮シミュレーター</h1>
 
-    <section id="cargo-input">
-        <div class="cargo-slots">
-            <div class="slot">
-                <label>積荷 1</label>
-                <input type="text" list="item-list" class="item-name" placeholder="品名を選択">
-                <div class="stock-input-group">
-                    <span>在庫数:</span>
-                    <input type="number" class="item-stock" value="0" min="0">
-                </div>
-                <div class="calc-result"></div>
+    <h1>🚢 積荷シミュレーター</h1>
+
+    <main class="cargo-slots">
+        <section class="slot">
+            <label for="item1">積荷 1</label>
+            <input type="text" id="item1" class="item-name" placeholder="品名を入力（例：パン）" list="item-list">
+            
+            <div class="stock-input-group">
+                <span>在庫数:</span>
+                <input type="number" class="item-stock" placeholder="0" min="0">
             </div>
-            <div class="slot">
-                <label>積荷 2</label>
-                <input type="text" list="item-list" class="item-name" placeholder="品名を選択">
-                <div class="stock-input-group">
-                    <span>在庫数:</span>
-                    <input type="number" class="item-stock" value="0" min="0">
+            
+            <div class="calc-result">
                 </div>
-                <div class="calc-result"></div>
+        </section>
+
+        <section class="slot">
+            <label for="item2">積荷 2</label>
+            <input type="text" id="item2" class="item-name" placeholder="品名を入力" list="item-list">
+            
+            <div class="stock-input-group">
+                <span>在庫数:</span>
+                <input type="number" class="item-stock" placeholder="0" min="0">
             </div>
-            <div class="slot">
-                <label>積荷 3</label>
-                <input type="text" list="item-list" class="item-name" placeholder="品名を選択">
-                <div class="stock-input-group">
-                    <span>在庫数:</span>
-                    <input type="number" class="item-stock" value="0" min="0">
-                </div>
-                <div class="calc-result"></div>
+            
+            <div class="calc-result"></div>
+        </section>
+
+        <section class="slot">
+            <label for="item3">積荷 3</label>
+            <input type="text" id="item3" class="item-name" placeholder="品名を入力" list="item-list">
+            
+            <div class="stock-input-group">
+                <span>在庫数:</span>
+                <input type="number" class="item-stock" placeholder="0" min="0">
             </div>
-        </div>
-        <datalist id="item-list"></datalist>
-    </section>
+            
+            <div class="calc-result"></div>
+        </section>
+    </main>
+
+    <datalist id="item-list"></datalist>
 
     <script src="recipe.js"></script>
-    <script src="base1.js"></script>
-    <script src="base2.js"></script>
-    <script src="base3.js"></script>
-    <script src="airplane_order.js"></script>
-    <script src="sub_materials.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
