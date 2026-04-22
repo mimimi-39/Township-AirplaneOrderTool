@@ -1,10 +1,52 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>準備中</title>
+    <meta charset="UTF-8">
+    <title>飛行機準備・在庫管理シミュレーター</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>ただいま調整中です</h1>
+    <h1>✈️ 飛行機予約・在庫考慮シミュレーター</h1>
+
+    <section id="cargo-input">
+        <div class="cargo-slots">
+            <div class="slot">
+                <label>積荷 1</label>
+                <input type="text" list="item-list" class="item-name" placeholder="品名を選択">
+                <div class="stock-input-group">
+                    <span>在庫数:</span>
+                    <input type="number" class="item-stock" value="0" min="0">
+                </div>
+                <div class="calc-result"></div>
+            </div>
+            <div class="slot">
+                <label>積荷 2</label>
+                <input type="text" list="item-list" class="item-name" placeholder="品名を選択">
+                <div class="stock-input-group">
+                    <span>在庫数:</span>
+                    <input type="number" class="item-stock" value="0" min="0">
+                </div>
+                <div class="calc-result"></div>
+            </div>
+            <div class="slot">
+                <label>積荷 3</label>
+                <input type="text" list="item-list" class="item-name" placeholder="品名を選択">
+                <div class="stock-input-group">
+                    <span>在庫数:</span>
+                    <input type="number" class="item-stock" value="0" min="0">
+                </div>
+                <div class="calc-result"></div>
+            </div>
+        </div>
+        <datalist id="item-list"></datalist>
+    </section>
+
+    <script src="recipe.js"></script>
+    <script src="base1.js"></script>
+    <script src="base2.js"></script>
+    <script src="base3.js"></script>
+    <script src="airplane_order.js"></script>
+    <script src="sub_materials.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
