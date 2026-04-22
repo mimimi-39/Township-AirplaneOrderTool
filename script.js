@@ -10,7 +10,6 @@ function getItemData(name) {
         typeof SUB_MATERIALS_DB !== 'undefined' ? SUB_MATERIALS_DB : null,
         typeof PLANE_ORDER_DB !== 'undefined' ? PLANE_ORDER_DB : null
     ];
-
     for (const db of dbs) {
         if (db && db[name]) return db[name];
     }
@@ -23,7 +22,6 @@ function getItemData(name) {
 function parseTimeToMinutes(timeValue) {
     if (!timeValue) return 0;
     if (typeof timeValue === 'number') return timeValue;
-    
     let totalMinutes = 0;
     const hourMatch = timeValue.match(/(\d+)時間/);
     const minMatch = timeValue.match(/(\d+)分/);
@@ -33,18 +31,19 @@ function parseTimeToMinutes(timeValue) {
 }
 
 /**
- * 3. アドバイス判定
+ * 3. アドバイス判定（5時間ルール）
  */
-function getAdvice(minutes) {
-    if (minutes <= 0) return `<span class="green">🔵 0分: 在庫で足りるよ！</span>`;
+function getAdvice(minutes, isLongProduct) {
+    if (minutes <= 0) return `<span class="green">🔵 在庫OK</span>`;
     
     const roundedMin = Math.round(minutes);
-    if (minutes > 300) {
+    // そもそも1個作るのに5時間かかる、または合計が5時間超え
+    if (isLongProduct || minutes > 300) {
         return `<span class="red">🔴 ${roundedMin}分: 市場/リクエスト推奨</span>`;
     } else if (minutes > 240) {
-        return `<span class="orange">🟡 ${roundedMin}分: ぎりぎり間に合う！</span>`;
+        return `<span class="orange">🟡 ${roundedMin}分: ぎりぎり！</span>`;
     } else {
-        return `<span class="green">🔵 ${roundedMin}分: 余裕だね！</span>`;
+        return `<span class="green">🔵 ${roundedMin}分: 余裕！</span>`;
     }
 }
 
@@ -55,56 +54,70 @@ function updateCalculation() {
     const slots = document.querySelectorAll('.slot');
 
     slots.forEach(slot => {
-        const nameInput = slot.querySelector('.item-name');
-        const stockInput = slot.querySelector('.item-stock');
+        const name = slot.querySelector('.item-name').value;
+        const stock = parseInt(slot.querySelector('.item-stock').value) || 0;
         const resultDiv = slot.querySelector('.calc-result');
-        
-        const name = nameInput.value;
-        const stock = parseInt(stockInput.value) || 0;
         
         const data = getItemData(name);
         const orderData = (typeof PLANE_ORDER_DB !== 'undefined') ? PLANE_ORDER_DB[name] : null;
 
         if (data && orderData) {
             const baseMin = parseTimeToMinutes(data.time);
-            const maxOrder = orderData.max;
-            const minOrder = orderData.min; 
-            const shortage = Math.max(0, maxOrder - stock); 
+            const shortage = Math.max(0, orderData.max - stock);
             
-            const yieldCount = data.yield || 1;
-            const cycles = Math.ceil(shortage / yieldCount);
+            // --- ロジックの肝：畑か工場か ---
+            let totalTime;
+            const isFarm = data.category === "農作物";
+            const isLongProduct = baseMin >= 300; // そもそも1個5時間以上
+
+            if (shortage === 0) {
+                totalTime = 0;
+            } else if (isFarm) {
+                // 農作物は畑で一斉に作るため「1回分の時間」とする
+                totalTime = baseMin;
+            } else {
+                // 工場製品は「サイクル数 × 時間」
+                const yieldCount = data.yield || 1;
+                const cycles = Math.ceil(shortage / yieldCount);
+                totalTime = cycles * baseMin;
+            }
+
+            // --- 原材料（レシピ）の生成 ---
+            let recipeHtml = "";
+            if (data.ingredients) {
+                recipeHtml = `<div class="recipe">【必要材料】<br>`;
+                for (const [ing, num] of Object.entries(data.ingredients)) {
+                    recipeHtml += `・${ing} × ${num * shortage} `;
+                }
+                recipeHtml += `</div>`;
+            }
 
             let html = `<div class="info">
-                最大: <strong>${maxOrder}個</strong> / 最小: <strong>${minOrder}個</strong><br>
-                不足分(最大時): <strong>${shortage}個</strong>
+                最大: ${orderData.max}個 / 最小: ${orderData.min}個<br>
+                不足: <strong>${shortage}個</strong> (${isFarm ? '畑で一斉収穫' : '工場で順次作成'})
+                ${recipeHtml}
             </div>`;
             
             if (shortage === 0) {
-                html += `<p class="green" style="font-weight:bold; margin-top:10px;">✅ 在庫でカバー可能です</p>`;
+                html += `<p class="green" style="text-align:center;">✅ 在庫十分！</p>`;
             } else {
                 html += `<ul class="advice-list">`;
                 [0, 5, 10, 15, 30, 40, 50].forEach(rate => {
-                    const totalMin = cycles * (baseMin * (1 - rate / 100));
-                    html += `<li><strong>${rate}%</strong>: ${getAdvice(totalMin)}</li>`;
+                    const calcMin = totalTime * (1 - rate / 100);
+                    html += `<li><strong>${rate}%</strong>: ${getAdvice(calcMin, isLongProduct)}</li>`;
                 });
                 html += `</ul>`;
             }
             resultDiv.innerHTML = html;
-        } else if (name) {
-            resultDiv.innerHTML = `<p class='error-text'>候補から選んでください</p>`;
         } else {
-            resultDiv.innerHTML = "";
+            resultDiv.innerHTML = name ? `<p class='error-text'>データ未登録</p>` : "";
         }
     });
 }
 
-/**
- * 5. 初期化
- */
+// 初期化（前のコードと同じなので省略、最後の input イベント監視は残す）
 window.onload = () => {
     const list = document.getElementById('item-list');
-    if (!list) return;
-
     const allNames = new Set();
     const dbRefs = [
         typeof FACTORY_DB !== 'undefined' ? FACTORY_DB : {},
@@ -114,29 +127,14 @@ window.onload = () => {
         typeof SUB_MATERIALS_DB !== 'undefined' ? SUB_MATERIALS_DB : {},
         typeof PLANE_ORDER_DB !== 'undefined' ? PLANE_ORDER_DB : {}
     ];
-
-    dbRefs.forEach(db => {
-        Object.keys(db).forEach(name => {
-            if (name && name !== "undefined") allNames.add(name);
-        });
-    });
-
-    // 候補リストを作成（あいうえお順）
+    dbRefs.forEach(db => Object.keys(db).forEach(n => allNames.add(n)));
     Array.from(allNames).sort().forEach(n => {
         const opt = document.createElement('option');
         opt.value = n;
         list.appendChild(opt);
     });
-
-    // --- 改良ポイント ---
     document.querySelectorAll('.item-name').forEach(input => {
-        // 入力欄をクリックした際、すでに入っている文字を選択状態にする
-        // これにより、そのまま打てば上書き、消したければ消せる
-        input.addEventListener('click', function() {
-            this.select(); 
-        });
+        input.addEventListener('click', function() { this.select(); });
     });
-
     document.addEventListener('input', updateCalculation);
-    console.log("シミュレーター正常起動。");
 };
