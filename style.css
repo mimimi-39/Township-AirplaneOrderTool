@@ -10,7 +10,7 @@
     --border-radius: 12px;
 }
 
-/* 横揺れ徹底排除 */
+/* 横揺れを完全に防ぐ */
 html, body {
     overflow-x: hidden;
     width: 100%;
@@ -33,48 +33,45 @@ h1 {
     margin: 10px 0 20px 0;
 }
 
-/* --- レイアウトの肝 --- */
+/* --- スマホ時（基本）のレイアウト --- */
 .cargo-slots {
     display: flex;
-    flex-direction: column; /* 基本は縦（スマホ） */
+    flex-direction: column; /* 縦並び */
     align-items: center;
-    gap: 15px;
-    width: 100%;
-    padding: 0 1%;         /* スマホで98%に見せるための調整 */
+    gap: 20px;
+    width: 100%;           /* 画面全体（100%）を使う */
     box-sizing: border-box;
 }
 
-/* スロット本体：スマホでは98%幅 */
 .slot {
     background: var(--card-bg);
     border-radius: var(--border-radius);
-    padding: 18px 12px;
-    width: 100%;            /* 親の98%幅に対して100% */
-    max-width: 100%;        /* スマホでは制限なし */
+    padding: 20px;
+    width: 86%;            /* スマホ時のカード幅は「86%」を維持 */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border: 1px solid #ddd;
     box-sizing: border-box;
 }
 
-/* PC用設定：画面幅が1024px以上の場合 */
+/* --- PC時（1024px以上）のレイアウト修正 --- */
 @media screen and (min-width: 1024px) {
     .cargo-slots {
-        flex-direction: row;    /* 横並びに変更 */
-        justify-content: center; /* 中央寄せ */
-        align-items: flex-start; /* 上揃え */
+        flex-direction: row;    /* 横並び */
+        justify-content: center;
+        align-items: flex-start;
         gap: 20px;
-        max-width: 1400px;      /* 広がりすぎ防止 */
+        width: 98%;             /* PC画面では全体を「98%」幅で使う */
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 0 20px;
     }
 
     .slot {
-        width: 32%;             /* 3つ並ぶように約3分の1幅 */
-        max-width: 400px;
+        width: 31%;             /* 横に3つ並ぶように調整 */
+        min-width: 320px;       /* 狭くなりすぎないように */
     }
 }
 
-/* ラベル・入力・結果表示の設定（以前のデカ文字設定を維持） */
+/* --- 可視性・操作性向上の設定（デカ文字・ズーム防止） --- */
 label {
     display: block;
     font-size: 1.25rem;
@@ -92,11 +89,12 @@ input {
     margin-bottom: 15px;
     border: 2px solid #bbb;
     border-radius: 8px;
-    font-size: 18px; /* ズーム防止用 */
+    font-size: 18px; /* 入力時ズーム防止（16px以上必須） */
     box-sizing: border-box;
     background-color: #fff;
     color: #000;
     outline: none;
+    -webkit-appearance: none;
 }
 
 input:focus {
