@@ -31,7 +31,7 @@ h1 {
     color: var(--accent-color);
     margin: 10px 0 25px 0;
     /* スマホでは「積荷1」と同じサイズ(1.4rem)に設定 */
-    font-size: 1.4rem; 
+    font-size: 1rem; 
     padding: 0 10px;
     line-height: 1.3;
 }
