@@ -1,22 +1,22 @@
 /* 全体の設定 */
 :root {
-    --bg-color: #f0f2f5;           /* 背景を少し濃くして白カードを際立たせる */
+    --bg-color: #f0f2f5;
     --card-bg: #ffffff;
-    --primary-text: #222222;       /* 文字はほぼ黒にしてコントラスト最大 */
-    --accent-color: #f57c00;       /* 視認性の高いオレンジ */
+    --primary-text: #222222;
+    --accent-color: #f57c00;
     --success-color: #2e7d32;
     --warning-color: #e65100;
     --danger-color: #c62828;
-    --border-radius: 12px;         /* ワイド画面に合わせて少しシャープに */
+    --border-radius: 12px;
 }
 
-/* 横揺れを徹底排除 */
+/* 横揺れ徹底排除 */
 html, body {
     overflow-x: hidden;
     width: 100%;
     margin: 0;
     padding: 0;
-    -webkit-text-size-adjust: 100%; /* iOSのフォント自動調整を抑制 */
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -33,28 +33,48 @@ h1 {
     margin: 10px 0 20px 0;
 }
 
-/* スロットを包むコンテナ */
+/* --- レイアウトの肝 --- */
 .cargo-slots {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* 基本は縦（スマホ） */
     align-items: center;
     gap: 15px;
     width: 100%;
+    padding: 0 1%;         /* スマホで98%に見せるための調整 */
+    box-sizing: border-box;
 }
 
-/* 98%幅：スマホ画面をフルに活用 */
+/* スロット本体：スマホでは98%幅 */
 .slot {
     background: var(--card-bg);
     border-radius: var(--border-radius);
-    padding: 18px 12px;       /* 内側の左右余白を絞って中身を広く */
-    width: 98%;               /* ご希望の98% */
-    max-width: 550px;         /* PCで見ても崩れないストッパー */
+    padding: 18px 12px;
+    width: 100%;            /* 親の98%幅に対して100% */
+    max-width: 100%;        /* スマホでは制限なし */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border: 1px solid #ddd;
     box-sizing: border-box;
 }
 
-/* 品目ラベル：大きく、ハッキリ */
+/* PC用設定：画面幅が1024px以上の場合 */
+@media screen and (min-width: 1024px) {
+    .cargo-slots {
+        flex-direction: row;    /* 横並びに変更 */
+        justify-content: center; /* 中央寄せ */
+        align-items: flex-start; /* 上揃え */
+        gap: 20px;
+        max-width: 1400px;      /* 広がりすぎ防止 */
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .slot {
+        width: 32%;             /* 3つ並ぶように約3分の1幅 */
+        max-width: 400px;
+    }
+}
+
+/* ラベル・入力・結果表示の設定（以前のデカ文字設定を維持） */
 label {
     display: block;
     font-size: 1.25rem;
@@ -65,28 +85,25 @@ label {
     border-left: 6px solid var(--accent-color);
 }
 
-/* 入力欄：18pxで絶対ズームさせない＆デカ文字 */
 input {
     width: 100%;
-    height: 54px;             /* 高さをさらに出して押しやすく */
+    height: 54px;
     padding: 0 12px;
     margin-bottom: 15px;
-    border: 2px solid #bbb;   /* 枠線を少し濃く */
+    border: 2px solid #bbb;
     border-radius: 8px;
-    font-size: 18px;          /* ズーム防止の決定打 */
+    font-size: 18px; /* ズーム防止用 */
     box-sizing: border-box;
     background-color: #fff;
     color: #000;
     outline: none;
-    -webkit-appearance: none;
 }
 
 input:focus {
-    border-color: #2196f3;    /* フォーカス時は青系で見やすく */
+    border-color: #2196f3;
     background-color: #f0f8ff;
 }
 
-/* 在庫数入力エリア */
 .stock-input-group {
     background: #fff3e0;
     padding: 10px;
@@ -99,12 +116,11 @@ input:focus {
     font-size: 1.1rem;
 }
 
-/* 結果表示エリア：横幅いっぱいを活かして1行の情報を増やす */
 .info {
     background: #e3f2fd;
     padding: 12px;
     border-radius: 8px;
-    font-size: 1.1rem;        /* 情報を大きく */
+    font-size: 1.1rem;
     color: #0d47a1;
     line-height: 1.6;
     border: 1px solid #bbdefb;
@@ -118,7 +134,6 @@ input:focus {
     color: #333;
 }
 
-/* 時短リスト：タップミスを防ぐため少し高さを出す */
 .advice-list {
     list-style: none;
     padding: 0;
@@ -137,7 +152,6 @@ input:focus {
     font-weight: bold;
 }
 
-/* 判定色：最大太さで強調 */
 .green { color: var(--success-color); font-weight: 900; }
 .orange { color: var(--warning-color); font-weight: 900; }
 .red { color: var(--danger-color); font-weight: 900; }
@@ -146,5 +160,4 @@ input:focus {
     color: #d32f2f;
     font-weight: bold;
     text-align: center;
-    padding: 10px;
 }
