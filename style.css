@@ -2,29 +2,35 @@
 :root {
     --bg-color: #f7f9fc;
     --card-bg: #ffffff;
-    --primary-text: #5a5a5a;
-    --accent-color: #ffb347;
-    --success-color: #72cc72;
-    --warning-color: #ff9a76;
-    --danger-color: #ff6b6b;
-    --border-radius: 20px;
+    --primary-text: #333333;       /* より濃くして読みやすく */
+    --accent-color: #ff9800;       /* 少し彩度を上げて視認性アップ */
+    --success-color: #2e7d32;      /* 濃いめの緑 */
+    --warning-color: #ef6c00;      /* 濃いめの橙 */
+    --danger-color: #d32f2f;       /* 濃いめの赤 */
+    --border-radius: 16px;
+}
+
+/* ズーム防止：htmlとbodyの横揺れを完全に止める */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 16px; /* 基本サイズを16pxに固定 */
 }
 
 body {
     font-family: "ヒラギノ丸ゴ Pro W4", "Hiragino Maru Gothic Pro", "Meiryo", sans-serif;
     background-color: var(--bg-color);
     color: var(--primary-text);
-    margin: 0;
-    padding: 20px 0; /* 左右は0にしてスロット側で制御 */
-    line-height: 1.6;
-    overflow-x: hidden; /* 横揺れ防止 */
+    padding: 20px 0;
 }
 
 h1 {
     text-align: center;
     color: var(--accent-color);
-    font-size: 1.6rem;
-    margin-bottom: 25px;
+    font-size: 1.8rem; /* タイトルを大きく */
+    margin-bottom: 20px;
 }
 
 /* スロットを包むコンテナ */
@@ -32,110 +38,111 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px;
+    gap: 20px;
     width: 100%;
 }
 
-/* スロット本体：最初から86%の幅で固定 */
+/* スロット本体：86%幅で固定、ズレを防止 */
 .slot {
     background: var(--card-bg);
     border-radius: var(--border-radius);
     padding: 20px;
-    width: 86%;            /* ご希望の86%固定 */
-    max-width: 500px;      /* PCでも広がりすぎないストッパー */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border: 3px solid #fff;
+    width: 86%;
+    max-width: 450px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid #eee;
     box-sizing: border-box;
-    /* transitionやtransformを削除して、勝手に動かないようにしました */
-    position: relative;
 }
 
+/* ラベル：品目名を大きく強調 */
 label {
     display: block;
-    font-size: 1rem;
+    font-size: 1.2rem; /* 1.2倍に拡大 */
     color: var(--accent-color);
     font-weight: bold;
     margin-bottom: 12px;
-    border-bottom: 2px solid #fff3e0;
+    border-left: 5px solid var(--accent-color);
+    padding-left: 10px;
 }
 
-/* 入力エリア */
+/* 入力エリア：ここが重要！16px以上に固定 */
 input {
     width: 100%;
-    padding: 12px 15px;
+    height: 50px;       /* 高さを出してタップしやすく */
+    padding: 0 15px;
     margin-bottom: 15px;
-    border: 2px solid #eee;
-    border-radius: 15px;
-    font-size: 1.1rem; /* スマホでズームされないよう16px相当以上に */
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    font-size: 18px;    /* 18pxなら絶対ズームされず、かつ読みやすい */
     box-sizing: border-box;
     background-color: #fff;
+    color: #000;        /* 入力文字はハッキリ黒で */
     -webkit-appearance: none;
 }
 
-/* 選択（フォーカス）時も位置がズレないよう、枠線の色だけ変える設定 */
 input:focus {
     outline: none;
     border-color: var(--accent-color);
-    background-color: #fffefb;
+    background-color: #fffdec;
 }
 
+/* 在庫数入力エリアの背景 */
 .stock-input-group {
-    background: #fff9f0;
-    padding: 12px;
-    border-radius: 15px;
+    background: #fff3e0;
+    padding: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
 }
 
-/* 結果表示・情報エリア */
+/* 結果表示エリア：背景色を濃くして文字を白抜きに近く */
 .info {
-    background: #f0f7ff;
+    background: #e3f2fd;
     padding: 15px;
-    border-radius: 15px;
-    font-size: 0.95rem;
-    color: #4a76a8;
+    border-radius: 12px;
+    font-size: 1.05rem; /* 少し大きく */
+    color: #1565c0;
+    line-height: 1.5;
 }
 
 .recipe {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed var(--accent-color);
-    font-size: 0.85rem;
-    color: #666;
+    border-top: 2px dashed #bbdefb;
+    font-size: 1rem;    /* 材料名も読みやすく */
+    color: #333;
+    font-weight: bold;
 }
 
-.island-alert {
-    background-color: #eef9ff;
-    border: 2px dashed #7fa8cc;
-    border-radius: 15px;
-    padding: 12px;
-    margin-top: 10px;
-}
-
+/* 時短リスト：1行を太く、大きく */
 .advice-list {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
+    margin: 15px 0 0 0;
 }
 
 .advice-list li {
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background: #fafafa;
-    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 6px;
+    background: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
+    font-size: 1rem;    /* リスト内の文字も大きく */
 }
 
-.green { color: var(--success-color); font-weight: bold; }
-.orange { color: var(--warning-color); font-weight: bold; }
-.red { color: var(--danger-color); font-weight: bold; }
+/* 判定色をよりハッキリ */
+.green { color: var(--success-color); font-weight: 900; }
+.orange { color: var(--warning-color); font-weight: 900; }
+.red { color: var(--danger-color); font-weight: 900; }
 
 .error-text {
-    color: #999;
-    font-size: 0.8rem;
+    color: #ff5252;
+    font-weight: bold;
     text-align: center;
 }
