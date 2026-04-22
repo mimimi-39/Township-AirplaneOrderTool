@@ -49,34 +49,40 @@ function getAdvice(minutes, isLongProduct) {
 
 /**
  * 4. メイン計算ロジック
+ * 畑（並列）と工場（順次）を区別し、材料の合計も算出します
  */
 function updateCalculation() {
     const slots = document.querySelectorAll('.slot');
 
     slots.forEach(slot => {
-        const name = slot.querySelector('.item-name').value;
-        const stock = parseInt(slot.querySelector('.item-stock').value) || 0;
+        const nameInput = slot.querySelector('.item-name');
+        const stockInput = slot.querySelector('.item-stock');
         const resultDiv = slot.querySelector('.calc-result');
+        
+        const name = nameInput.value;
+        const stock = parseInt(stockInput.value) || 0;
         
         const data = getItemData(name);
         const orderData = (typeof PLANE_ORDER_DB !== 'undefined') ? PLANE_ORDER_DB[name] : null;
 
         if (data && orderData) {
             const baseMin = parseTimeToMinutes(data.time);
-            const shortage = Math.max(0, orderData.max - stock);
+            const maxOrder = orderData.max;
+            const minOrder = orderData.min;
+            const shortage = Math.max(0, maxOrder - stock); 
             
-            // --- ロジックの肝：畑か工場か ---
+            // --- 時間計算ロジック ---
             let totalTime;
-            const isFarm = data.category === "農作物";
-            const isLongProduct = baseMin >= 300; // そもそも1個5時間以上
+            const isFarm = (data.category === "農作物");
+            const isLongProduct = (baseMin >= 300); // 1個で5時間以上かかるか
 
             if (shortage === 0) {
                 totalTime = 0;
             } else if (isFarm) {
-                // 農作物は畑で一斉に作るため「1回分の時間」とする
+                // 農作物は畑が空いていれば一斉に植えられるので「1回分の時間」
                 totalTime = baseMin;
             } else {
-                // 工場製品は「サイクル数 × 時間」
+                // 工場製品は予約スロットで1つずつ作るので「サイクル数 × 時間」
                 const yieldCount = data.yield || 1;
                 const cycles = Math.ceil(shortage / yieldCount);
                 totalTime = cycles * baseMin;
@@ -84,33 +90,53 @@ function updateCalculation() {
 
             // --- 原材料（レシピ）の生成 ---
             let recipeHtml = "";
-            if (data.ingredients) {
+            if (data.ingredients && shortage > 0) {
                 recipeHtml = `<div class="recipe">【必要材料】<br>`;
-                for (const [ing, num] of Object.entries(data.ingredients)) {
-                    recipeHtml += `・${ing} × ${num * shortage} `;
+                
+                // オブジェクトの各エントリーをループ
+                for (let [key, value] of Object.entries(data.ingredients)) {
+                    let itemName = key;
+                    let countPerUnit = parseFloat(value);
+
+                    // もし key が数字で value が品名だった場合の入れ替え（念のための保護）
+                    if (isNaN(countPerUnit)) {
+                        itemName = value;
+                        countPerUnit = parseFloat(key);
+                    }
+
+                    // 数字が有効なら不足分を掛け算して表示
+                    if (!isNaN(countPerUnit)) {
+                        const totalNeeded = Math.ceil(countPerUnit * shortage);
+                        recipeHtml += `・${itemName} × ${totalNeeded}個<br>`;
+                    }
                 }
                 recipeHtml += `</div>`;
             }
 
+            // --- HTML出力 ---
             let html = `<div class="info">
-                最大: ${orderData.max}個 / 最小: ${orderData.min}個<br>
+                最大: <strong>${maxOrder}個</strong> / 最小: <strong>${minOrder}個</strong><br>
                 不足: <strong>${shortage}個</strong> (${isFarm ? '畑で一斉収穫' : '工場で順次作成'})
                 ${recipeHtml}
             </div>`;
             
             if (shortage === 0) {
-                html += `<p class="green" style="text-align:center;">✅ 在庫十分！</p>`;
+                html += `<p class="green" style="text-align:center; font-weight:bold; margin-top:10px;">✅ 在庫でカバー可能です</p>`;
             } else {
                 html += `<ul class="advice-list">`;
+                // 0%〜50%の時短率をループ
                 [0, 5, 10, 15, 30, 40, 50].forEach(rate => {
                     const calcMin = totalTime * (1 - rate / 100);
+                    // 1個5時間以上の品、または計算結果が5時間以上の場合は警告が出る仕組み
                     html += `<li><strong>${rate}%</strong>: ${getAdvice(calcMin, isLongProduct)}</li>`;
                 });
                 html += `</ul>`;
             }
             resultDiv.innerHTML = html;
+        } else if (name) {
+            resultDiv.innerHTML = `<p class='error-text'>データ未登録です</p>`;
         } else {
-            resultDiv.innerHTML = name ? `<p class='error-text'>データ未登録</p>` : "";
+            resultDiv.innerHTML = "";
         }
     });
 }
