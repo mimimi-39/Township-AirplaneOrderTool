@@ -1,13 +1,13 @@
 /* 全体の設定 */
 :root {
-    --bg-color: #f7f9fc;           /* 清潔感のある明るいグレーブルー */
+    --bg-color: #f7f9fc;
     --card-bg: #ffffff;
     --primary-text: #5a5a5a;
-    --accent-color: #ffb347;       /* 楽しさを出すハニーオレンジ */
-    --success-color: #72cc72;      /* 余裕：明るいグリーン */
-    --warning-color: #ff9a76;      /* ギリギリ：元気なコーラル */
-    --danger-color: #ff6b6b;       /* 購入推奨：明るいレッド */
-    --border-radius: 20px;         /* もっとなだらかな角丸 */
+    --accent-color: #ffb347;
+    --success-color: #72cc72;
+    --warning-color: #ff9a76;
+    --danger-color: #ff6b6b;
+    --border-radius: 20px;
 }
 
 body {
@@ -15,43 +15,39 @@ body {
     background-color: var(--bg-color);
     color: var(--primary-text);
     margin: 0;
-    padding: 20px 10px; /* スマホ用に左右余白を調整 */
+    padding: 20px 0; /* 左右は0にしてスロット側で制御 */
     line-height: 1.6;
+    overflow-x: hidden; /* 横揺れ防止 */
 }
 
 h1 {
     text-align: center;
     color: var(--accent-color);
-    font-size: 1.8rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    font-size: 1.6rem;
     margin-bottom: 25px;
 }
 
-/* --- レイアウトの肝：縦並び設定 --- */
+/* スロットを包むコンテナ */
 .cargo-slots {
     display: flex;
-    flex-direction: column;    /* 常に縦一列に並べる */
-    align-items: center;       /* 中央に寄せる */
-    gap: 20px;                 /* カード間の隙間 */
-    max-width: 600px;          /* 横に広がりすぎないように制限 */
-    margin: 0 auto;            /* 全体を中央に配置 */
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    width: 100%;
 }
 
-/* 各スロット（積荷カード） */
+/* スロット本体：最初から86%の幅で固定 */
 .slot {
     background: var(--card-bg);
     border-radius: var(--border-radius);
     padding: 20px;
-    width: 100%;               /* スマホ幅に合わせる */
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    width: 86%;            /* ご希望の86%固定 */
+    max-width: 500px;      /* PCでも広がりすぎないストッパー */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     border: 3px solid #fff;
-    box-sizing: border-box;    /* 枠線を含めて幅を計算 */
-    transition: transform 0.2s;
+    box-sizing: border-box;
+    /* transitionやtransformを削除して、勝手に動かないようにしました */
     position: relative;
-}
-
-.slot:hover {
-    transform: translateY(-3px); /* 軽く浮かせて操作感を出す */
 }
 
 label {
@@ -59,26 +55,28 @@ label {
     font-size: 1rem;
     color: var(--accent-color);
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     border-bottom: 2px solid #fff3e0;
 }
 
-/* 入力欄のデザイン */
+/* 入力エリア */
 input {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 15px;
     border: 2px solid #eee;
     border-radius: 15px;
-    font-size: 1rem;
+    font-size: 1.1rem; /* スマホでズームされないよう16px相当以上に */
     box-sizing: border-box;
-    -webkit-appearance: none; /* iOSのデフォルトスタイルを抑える */
+    background-color: #fff;
+    -webkit-appearance: none;
 }
 
+/* 選択（フォーカス）時も位置がズレないよう、枠線の色だけ変える設定 */
 input:focus {
     outline: none;
     border-color: var(--accent-color);
-    background-color: #fffdf9;
+    background-color: #fffefb;
 }
 
 .stock-input-group {
@@ -91,14 +89,13 @@ input:focus {
     margin-bottom: 15px;
 }
 
-/* 結果表示エリア */
+/* 結果表示・情報エリア */
 .info {
     background: #f0f7ff;
     padding: 15px;
     border-radius: 15px;
     font-size: 0.95rem;
     color: #4a76a8;
-    margin-bottom: 15px;
 }
 
 .recipe {
@@ -107,37 +104,25 @@ input:focus {
     border-top: 1px dashed var(--accent-color);
     font-size: 0.85rem;
     color: #666;
-    line-height: 1.5;
 }
 
-/* 島特産品用のアラート */
 .island-alert {
     background-color: #eef9ff;
     border: 2px dashed #7fa8cc;
     border-radius: 15px;
     padding: 12px;
     margin-top: 10px;
-    font-size: 0.85rem;
 }
 
-.island-title {
-    font-weight: bold;
-    color: #2c5d8a;
-    display: block;
-    text-align: center;
-    margin-bottom: 5px;
-}
-
-/* 時短リスト */
 .advice-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 10px 0 0 0;
 }
 
 .advice-list li {
     padding: 8px 10px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     background: #fafafa;
     border-radius: 10px;
     display: flex;
@@ -145,7 +130,6 @@ input:focus {
     font-size: 0.85rem;
 }
 
-/* 判定色 */
 .green { color: var(--success-color); font-weight: bold; }
 .orange { color: var(--warning-color); font-weight: bold; }
 .red { color: var(--danger-color); font-weight: bold; }
@@ -154,11 +138,4 @@ input:focus {
     color: #999;
     font-size: 0.8rem;
     text-align: center;
-}
-
-/* スマホ対応（さらに画面が小さい時） */
-@media (max-width: 400px) {
-    body { padding: 10px 5px; }
-    .slot { padding: 15px; }
-    h1 { font-size: 1.5rem; }
 }
