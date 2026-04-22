@@ -7,7 +7,7 @@
     --success-color: #72cc72;      /* 余裕：明るいグリーン */
     --warning-color: #ff9a76;      /* ギリギリ：元気なコーラル */
     --danger-color: #ff6b6b;       /* 購入推奨：明るいレッド */
-    --border-radius: 20px;         /* もっとなだらかな角丸に */
+    --border-radius: 20px;         /* もっとなだらかな角丸 */
 }
 
 body {
@@ -15,65 +15,55 @@ body {
     background-color: var(--bg-color);
     color: var(--primary-text);
     margin: 0;
-    padding: 20px;
+    padding: 20px 10px; /* スマホ用に左右余白を調整 */
+    line-height: 1.6;
 }
 
 h1 {
     text-align: center;
     color: var(--accent-color);
-    font-size: 2rem;
+    font-size: 1.8rem;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
-/* カードのレイアウト */
+/* --- レイアウトの肝：縦並び設定 --- */
 .cargo-slots {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 25px;
-    max-width: 1200px;
-    margin: 0 auto;
+    flex-direction: column;    /* 常に縦一列に並べる */
+    align-items: center;       /* 中央に寄せる */
+    gap: 20px;                 /* カード間の隙間 */
+    max-width: 600px;          /* 横に広がりすぎないように制限 */
+    margin: 0 auto;            /* 全体を中央に配置 */
 }
 
-/* 各スロット：マルシェの屋台のようなイメージ */
+/* 各スロット（積荷カード） */
 .slot {
     background: var(--card-bg);
     border-radius: var(--border-radius);
-    padding: 25px;
-    width: 320px;
+    padding: 20px;
+    width: 100%;               /* スマホ幅に合わせる */
     box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-    border: 3px solid #fff; /* 白枠でクッキリさせる */
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 3px solid #fff;
+    box-sizing: border-box;    /* 枠線を含めて幅を計算 */
+    transition: transform 0.2s;
     position: relative;
-    overflow: hidden;
-}
-
-.slot::before {
-    content: "🚢"; /* 積荷のアイコン */
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 4rem;
-    opacity: 0.05;
-    transform: rotate(15deg);
 }
 
 .slot:hover {
-    transform: scale(1.03); /* ぷるんと少し大きく */
-    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    transform: translateY(-3px); /* 軽く浮かせて操作感を出す */
 }
 
 label {
     display: block;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--accent-color);
     font-weight: bold;
     margin-bottom: 10px;
     border-bottom: 2px solid #fff3e0;
 }
 
-/* 入力エリア：ぷにぷにした質感 */
+/* 入力欄のデザイン */
 input {
     width: 100%;
     padding: 12px 15px;
@@ -82,14 +72,13 @@ input {
     border-radius: 15px;
     font-size: 1rem;
     box-sizing: border-box;
-    transition: all 0.2s;
+    -webkit-appearance: none; /* iOSのデフォルトスタイルを抑える */
 }
 
 input:focus {
     outline: none;
     border-color: var(--accent-color);
     background-color: #fffdf9;
-    box-shadow: 0 0 8px rgba(255, 179, 71, 0.3);
 }
 
 .stock-input-group {
@@ -99,7 +88,7 @@ input:focus {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 /* 結果表示エリア */
@@ -110,86 +99,66 @@ input:focus {
     font-size: 0.95rem;
     color: #4a76a8;
     margin-bottom: 15px;
-    text-align: center;
-}
-
-.advice-list {
-    list-style: none;
-    padding: 0;
-}
-
-.advice-list li {
-    padding: 10px;
-    margin-bottom: 5px;
-    background: #fff;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
-}
-
-/* 判定色：もっと鮮やかに！ */
-.green { color: var(--success-color); font-weight: bold; }
-.orange { color: var(--warning-color); font-weight: bold; }
-.red { color: var(--danger-color); font-weight: bold; }
-
-/* 在庫OKのときの演出 */
-.calc-result p.green {
-    text-align: center;
-    font-size: 1.1rem;
-    padding: 10px;
-    background: #e8f5e9;
-    border-radius: 10px;
-    animation: bounce 1s infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-/* スマホ対応 */
-@media (max-width: 600px) {
-    .slot { width: 100%; }
 }
 
 .recipe {
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px dashed var(--accent-color);
-    font-size: 0.8rem;
-    color: #888;
-    text-align: left;
+    font-size: 0.85rem;
+    color: #666;
     line-height: 1.5;
 }
 
-.recipe b {
-    color: var(--warning-color);
-}
-
-/* 島特産品用のアラートボックス */
+/* 島特産品用のアラート */
 .island-alert {
-    background-color: #f0f7ff;
+    background-color: #eef9ff;
     border: 2px dashed #7fa8cc;
     border-radius: 15px;
-    padding: 15px;
+    padding: 12px;
     margin-top: 10px;
     font-size: 0.85rem;
-    line-height: 1.4;
-    color: #4a6a8a;
 }
 
 .island-title {
     font-weight: bold;
     color: #2c5d8a;
-    margin-bottom: 8px;
     display: block;
     text-align: center;
-    border-bottom: 1px solid #7fa8cc;
+    margin-bottom: 5px;
 }
 
-.island-alert strong {
-    text-decoration: underline;
-    color: var(--danger-color);
+/* 時短リスト */
+.advice-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.advice-list li {
+    padding: 8px 10px;
+    margin-bottom: 4px;
+    background: #fafafa;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+/* 判定色 */
+.green { color: var(--success-color); font-weight: bold; }
+.orange { color: var(--warning-color); font-weight: bold; }
+.red { color: var(--danger-color); font-weight: bold; }
+
+.error-text {
+    color: #999;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* スマホ対応（さらに画面が小さい時） */
+@media (max-width: 400px) {
+    body { padding: 10px 5px; }
+    .slot { padding: 15px; }
+    h1 { font-size: 1.5rem; }
 }
